@@ -1,5 +1,3 @@
-// 28 may 2016
-
 #include <dlfcn.h>
 #include <math.h>
 #include <stdio.h>
