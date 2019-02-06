@@ -1,3 +1,9 @@
+#include <dlfcn.h>
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include "libui/ui.h"
+
 typedef struct CInitOptionsS {
   char* args;
   char* url;

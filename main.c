@@ -1,8 +1,3 @@
-#include <dlfcn.h>
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include "libui/ui.h"
 #include "main.h"
 
 static uiOpenGLArea* sArea = NULL;
@@ -16,20 +11,20 @@ void perform_updates() {
 
 void flush() {
   printf("calling flush\n");
-	uiOpenGLAreaSwapBuffers(sArea);
+  uiOpenGLAreaSwapBuffers(sArea);
 }
 
 void make_current() {
   printf("calling make_current\n");
-	uiOpenGLAreaMakeCurrent(sArea);
+  uiOpenGLAreaMakeCurrent(sArea);
 }
 
 static void onMouseEvent(uiOpenGLAreaHandler *h, uiOpenGLArea *a, uiAreaMouseEvent *e) {
 }
 
 static void onInitGL(uiOpenGLAreaHandler *h, uiOpenGLArea *a) {
-	uiOpenGLAreaSetVSync(a, 1);
-	uiOpenGLAreaMakeCurrent(a);
+  uiOpenGLAreaSetVSync(a, 1);
+  uiOpenGLAreaMakeCurrent(a);
   sArea = a;
   loadServo();
 }
@@ -37,7 +32,7 @@ static void onInitGL(uiOpenGLAreaHandler *h, uiOpenGLArea *a) {
 static void onDrawGL(uiOpenGLAreaHandler *h, uiOpenGLArea *a, double width, double height) {
   make_current();
   /* perform_updates(); */
-  flush();
+  /* flush(); */
   /* uiOpenGLAreaQueueRedrawAll(a); */
 }
 
@@ -46,7 +41,7 @@ static uiOpenGLAreaHandler AREA_HANDLER = { onDrawGL, onMouseEvent, onMouseCross
 static int render(void *d) {
   perform_updates();
   /* uiOpenGLAreaQueueRedrawAll(d); */
-	return 1;
+  return 1;
 }
 
 void wakeup() {
@@ -54,63 +49,63 @@ void wakeup() {
 
 static int onClosing(uiWindow *w, void *data)
 {
-	uiControlDestroy(uiControl(w));
-	uiQuit();
-	return 0;
+  uiControlDestroy(uiControl(w));
+  uiQuit();
+  return 0;
 }
 
 static int shouldQuit(void *data)
 {
-	uiControlDestroy((uiControl *)data);
-	return 1;
+  uiControlDestroy((uiControl *)data);
+  return 1;
 }
 
 int main(void)
 {
-	uiInitOptions o = { 0 };
-	const char *err = uiInit(&o);
-	if (err != NULL) {
-		fprintf(stderr, "error initializing ui: %s\n", err);
-		uiFreeInitError(err);
-		return 1;
-	}
+  uiInitOptions o = { 0 };
+  const char *err = uiInit(&o);
+  if (err != NULL) {
+    fprintf(stderr, "error initializing ui: %s\n", err);
+    uiFreeInitError(err);
+    return 1;
+  }
 
-	uiWindow *mainwin = uiNewWindow("libui OpenGL Example", 900, 900, 1);
-	uiWindowSetMargined(mainwin, 1);
-	uiWindowOnClosing(mainwin, onClosing, NULL);
-	uiOnShouldQuit(shouldQuit, mainwin);
+  uiWindow *mainwin = uiNewWindow("libui OpenGL Example", 900, 900, 1);
+  uiWindowSetMargined(mainwin, 1);
+  uiWindowOnClosing(mainwin, onClosing, NULL);
+  uiOnShouldQuit(shouldQuit, mainwin);
 
-	uiBox *b = uiNewVerticalBox();
-	uiBoxSetPadded(b, 1);
-	uiWindowSetChild(mainwin, uiControl(b));
+  uiBox *b = uiNewVerticalBox();
+  uiBoxSetPadded(b, 1);
+  uiWindowSetChild(mainwin, uiControl(b));
 
-	uiBoxAppend(b, uiControl(uiNewLabel("hi")), 0);
+  uiBoxAppend(b, uiControl(uiNewLabel("hi")), 0);
 
-	uiOpenGLAttributes *attribs = uiNewOpenGLAttributes();
-	uiOpenGLAttributesSetAttribute(attribs, uiOpenGLAttributeDoubleBuffer, 1);
-	uiOpenGLAttributesSetAttribute(attribs, uiOpenGLAttributeRedBits, 32);
-	uiOpenGLAttributesSetAttribute(attribs, uiOpenGLAttributeGreenBits, 32);
-	uiOpenGLAttributesSetAttribute(attribs, uiOpenGLAttributeBlueBits, 32);
-	uiOpenGLAttributesSetAttribute(attribs, uiOpenGLAttributeAlphaBits, 8);
-	uiOpenGLAttributesSetAttribute(attribs, uiOpenGLAttributeStencilBits, 8);
+  uiOpenGLAttributes *attribs = uiNewOpenGLAttributes();
+  uiOpenGLAttributesSetAttribute(attribs, uiOpenGLAttributeDoubleBuffer, 1);
+  uiOpenGLAttributesSetAttribute(attribs, uiOpenGLAttributeRedBits, 32);
+  uiOpenGLAttributesSetAttribute(attribs, uiOpenGLAttributeGreenBits, 32);
+  uiOpenGLAttributesSetAttribute(attribs, uiOpenGLAttributeBlueBits, 32);
+  uiOpenGLAttributesSetAttribute(attribs, uiOpenGLAttributeAlphaBits, 8);
+  uiOpenGLAttributesSetAttribute(attribs, uiOpenGLAttributeStencilBits, 8);
 
-	uiOpenGLAttributesSetAttribute(attribs, uiOpenGLAttributeMajorVersion, 3);
-	uiOpenGLAttributesSetAttribute(attribs, uiOpenGLAttributeMinorVersion, 2);
+  uiOpenGLAttributesSetAttribute(attribs, uiOpenGLAttributeMajorVersion, 3);
+  uiOpenGLAttributesSetAttribute(attribs, uiOpenGLAttributeMinorVersion, 2);
 
-	uiOpenGLArea *glarea = uiNewOpenGLArea(&AREA_HANDLER, attribs);
+  uiOpenGLArea *glarea = uiNewOpenGLArea(&AREA_HANDLER, attribs);
 
-	uiBoxAppend(b, uiControl(glarea), 1);
+  uiBoxAppend(b, uiControl(glarea), 1);
 
-	uiTimer(1000/60, render, glarea);
+  uiTimer(1000/60, render, glarea);
 
-	uiControlShow(uiControl(mainwin));
+  uiControlShow(uiControl(mainwin));
 
-	uiMain();
+  uiMain();
 
-	uiFreeOpenGLAttributes(attribs);
+  uiFreeOpenGLAttributes(attribs);
 
-	uiUninit();
-	return 0;
+  uiUninit();
+  return 0;
 }
 
 void on_load_started() {}
