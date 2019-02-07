@@ -1,12 +1,10 @@
 #include "main.h"
+#include "/Users/paul/git/servo/target/release/simpleservo.h"
 
 static uiOpenGLArea* sArea = NULL;
-static servo_perform_updates* perform_updates_internal = NULL;
 
-void perform_updates() {
-  if (perform_updates_internal != NULL) {
-    perform_updates_internal();
-  }
+void perform_updates_() {
+  perform_updates();
 }
 
 void flush() {
@@ -116,76 +114,7 @@ void on_history_changed(bool back, bool fwd) {}
 void on_animating_changed(bool animating) {}
 void on_shutdown_complete() {}
 
-typedef struct CFileContentS {
-  char* content;
-  uint32_t size;
-} CFileContent;
-
-CFileContent readfile2(char* filename) {
-  printf("Reading %s\n", filename);
-  /* declare a file pointer */
-  FILE    *infile;
-  char    *buffer;
-  long    numbytes;
-
-  /* open an existing file for reading */
-  infile = fopen(filename, "r");
-
-  /* quit if the file does not exist */
-  if(infile == NULL) {
-    exit(1);
-  }
-
-  /* Get the number of bytes */
-  fseek(infile, 0L, SEEK_END);
-  numbytes = ftell(infile);
-
-  fseek(infile, 0L, SEEK_SET);	
-  buffer = (char*)calloc(numbytes, sizeof(char));	
-  if(buffer == NULL) {
-    exit(1);
-  }
-
-  fread(buffer, sizeof(char), numbytes, infile);
-  fclose(infile);
-
-  CFileContent c;
-
-  c.content = buffer;
-  c.size = numbytes;
-
-  return c;
-}
-
-CFileContent readfile(char* name) {
-  printf("readfile: %s\n", name);
-  char buf[256]; // FIXME. Don't.
-  snprintf(buf, sizeof buf, "%s%s", "/tmp/resources/", name);
-  CFileContent file = readfile2(buf);
-  return file;
-}
-
 int loadServo() {
-  void* handle = dlopen("/tmp/libsimpleservo.dylib", RTLD_LAZY);
-  if (handle == NULL) {
-    fprintf(stderr, "Could not open libsimpleservo: %s\n", dlerror());
-    return 1;
-  }
-
-  servo_init_with_gl* init = dlsym(handle, "init_with_gl");
-  if (init == NULL) {
-    fprintf(stderr, "Could not find init_with_gl symbol: %s\n", dlerror());
-    return 1;
-  }
-
-  perform_updates_internal = dlsym(handle, "perform_updates");
-  if (perform_updates_internal == NULL) {
-    fprintf(stderr, "Could not find perform_updates symbol: %s\n", dlerror());
-    return 1;
-  }
-
-  /** --- init --- **/
-
   CInitOptions o;
   o.args = "[\"https://example.com\"]";
   o.url = "https://servo.org";
@@ -205,12 +134,5 @@ int loadServo() {
   c.on_animating_changed = &on_animating_changed;
   c.on_shutdown_complete = &on_shutdown_complete;
 
-  init(o, &wakeup, &readfile, c);
-
-  /* if (dlclose(handle) != 0) { */
-  /*   fprintf(stderr, "Could not close libsimpleservo: %s\n", dlerror()); */
-  /*   return 1; */
-  /* } */
-  return 0;
+  init_with_gl(o, &wakeup, c);
 }
-
