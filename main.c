@@ -1,5 +1,4 @@
 #include "main.h"
-#include "/Users/paul/git/servo/target/release/simpleservo.h"
 
 static uiOpenGLArea* sArea = NULL;
 
@@ -80,15 +79,9 @@ int main(void)
   uiBoxAppend(b, uiControl(uiNewLabel("hi")), 0);
 
   uiOpenGLAttributes *attribs = uiNewOpenGLAttributes();
-  uiOpenGLAttributesSetAttribute(attribs, uiOpenGLAttributeDoubleBuffer, 1);
-  uiOpenGLAttributesSetAttribute(attribs, uiOpenGLAttributeRedBits, 32);
-  uiOpenGLAttributesSetAttribute(attribs, uiOpenGLAttributeGreenBits, 32);
-  uiOpenGLAttributesSetAttribute(attribs, uiOpenGLAttributeBlueBits, 32);
-  uiOpenGLAttributesSetAttribute(attribs, uiOpenGLAttributeAlphaBits, 8);
-  uiOpenGLAttributesSetAttribute(attribs, uiOpenGLAttributeStencilBits, 8);
-
-  uiOpenGLAttributesSetAttribute(attribs, uiOpenGLAttributeMajorVersion, 3);
-  uiOpenGLAttributesSetAttribute(attribs, uiOpenGLAttributeMinorVersion, 2);
+	uiOpenGLAttributesSetAttribute(attribs, uiOpenGLAttributeMajorVersion, 3);
+	uiOpenGLAttributesSetAttribute(attribs, uiOpenGLAttributeMinorVersion, 3);
+	uiOpenGLAttributesSetAttribute(attribs, uiOpenGLAttributeCompatProfile, 0);
 
   uiOpenGLArea *glarea = uiNewOpenGLArea(&AREA_HANDLER, attribs);
 
@@ -114,7 +107,7 @@ void on_history_changed(bool back, bool fwd) {}
 void on_animating_changed(bool animating) {}
 void on_shutdown_complete() {}
 
-int loadServo() {
+void loadServo() {
   CInitOptions o;
   o.args = "[\"https://example.com\"]";
   o.url = "https://servo.org";
