@@ -2,19 +2,7 @@
 
 static uiOpenGLArea* sArea = NULL;
 
-void perform_updates_() {
-  perform_updates();
-}
-
-void flush() {
-  printf("calling flush\n");
-  uiOpenGLAreaSwapBuffers(sArea);
-}
-
-void make_current() {
-  printf("calling make_current\n");
-  uiOpenGLAreaMakeCurrent(sArea);
-}
+// uiOpenGLArea callbacks:
 
 static void onMouseEvent(uiOpenGLAreaHandler *h, uiOpenGLArea *a, uiAreaMouseEvent *e) {
 }
@@ -27,21 +15,6 @@ static void onInitGL(uiOpenGLAreaHandler *h, uiOpenGLArea *a) {
 }
 
 static void onDrawGL(uiOpenGLAreaHandler *h, uiOpenGLArea *a, double width, double height) {
-  make_current();
-  /* perform_updates(); */
-  /* flush(); */
-  /* uiOpenGLAreaQueueRedrawAll(a); */
-}
-
-static uiOpenGLAreaHandler AREA_HANDLER = { onDrawGL, onMouseEvent, onMouseCrossed, onDragBroken, onKeyEvent, onInitGL };
-
-static int render(void *d) {
-  perform_updates();
-  /* uiOpenGLAreaQueueRedrawAll(d); */
-  return 1;
-}
-
-void wakeup() {
 }
 
 static int onClosing(uiWindow *w, void *data)
@@ -55,6 +28,31 @@ static int shouldQuit(void *data)
 {
   uiControlDestroy((uiControl *)data);
   return 1;
+}
+
+static uiOpenGLAreaHandler AREA_HANDLER = {
+  onDrawGL,
+  onMouseEvent,
+  onMouseCrossed,
+  onDragBroken,
+  onKeyEvent,
+  onInitGL
+};
+
+// Servo callbacks
+
+void flush() {
+  printf("calling flush\n");
+  uiOpenGLAreaSwapBuffers(sArea);
+}
+
+void make_current() {
+  printf("calling make_current\n");
+  uiOpenGLAreaMakeCurrent(sArea);
+}
+
+void wakeup() {
+  uiQueueMain(perform_updates, NULL);
 }
 
 int main(void)
@@ -86,8 +84,6 @@ int main(void)
   uiOpenGLArea *glarea = uiNewOpenGLArea(&AREA_HANDLER, attribs);
 
   uiBoxAppend(b, uiControl(glarea), 1);
-
-  uiTimer(1000/60, render, glarea);
 
   uiControlShow(uiControl(mainwin));
 
